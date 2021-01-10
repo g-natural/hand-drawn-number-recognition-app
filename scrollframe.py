@@ -26,9 +26,8 @@ class ScrollFrame(tk.Frame):
         self.bind('<Enter>', self._on_mouse_enter)
         self.bind('<Leave>', self._on_mouse_leave)
 
-        self.canvas.grid_rowconfigure(0, weight=1)
-        self.scrollable_frame.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
     # cross-platform mousewheel scrolling handler
     def _mouse_wheel(self, event):
@@ -46,17 +45,3 @@ class ScrollFrame(tk.Frame):
     def _on_mouse_leave(self, event):
         self.unbind_all("<Button-4>")
         self.unbind_all("<Button-5>")
-
-
-# def main():
-#     root = tk.Tk()
-#     scrollframe = ScrollFrame(root)
-
-#     for i in range(50):
-#         tk.Label(scrollframe.scrollable_frame, text=f"Sample scrolling label {i}").pack()
-
-#     scrollframe.grid(row=0, column=0)
-
-#     root.mainloop()
-
-# main()

@@ -1,7 +1,7 @@
 import tkinter as tk
 import CRNNetwork as cr
 import blockcanvas as bc
-import correction_popup as cp
+import network_viewer as nv
 import numpy as np
 import pickle
 import os
@@ -46,30 +46,34 @@ class NumRecApp(tk.Tk):
         interpret_button = tk.Button(
             interpret_frame, text="Interpret", padx=25, pady=10)
         interpret_button.config(command=self.interpret)
-        incorrect_button = tk.Button(
-            interpret_frame, text="Incorrect", padx=25, pady=10)
-        incorrect_button.config(command=self.correction)
 
         interpret_frame.grid(row=0, column=1)
         interpret_top_label.grid(row=0, column=0)
         num_background.grid(row=1, column=0)
         self.num_display_label.grid(row=0, column=0)
         interpret_button.grid(row=2, column=0)
-        incorrect_button.grid(row=4, column=0, sticky="s")
 
-        # popup window for corrections to network
-        self.corr_popup = cp.CorrectionPopup(self)
-        self.corr_popup.withdraw()  # hide until needed
+        # network viewing utility to view network in detail
+        self.network_viewer = nv.NetworkViewer(self, self.network)
+        self.network_viewer.withdraw()
+        
+        # menu bar with option to view network details
+        menubar = tk.Menu(self)
+        netview_menu = tk.Menu(menubar, tearoff=0)
+        netview_menu.add_command(label="View Neural Network",
+                                 command=self.network_viewer.deiconify)
+        menubar.add_cascade(label="Model", menu=netview_menu)
+        self.config(menu=menubar)
 
         self.drawing_canvas.bind('<B1-Motion>', self.draw)
         self.drawing_canvas.bind('<ButtonPress-1>', self.draw)
-        self.bind("<<CorrectionRequest>>", self.update_network)
-        self.bind("<<CorrectionCancel>>", self.correction_return)
+        self.bind("<<NetViewExit>>",
+                  lambda event: self.network_viewer.withdraw())
 
     def interpret(self):
         vector = self.drawing_canvas.blockmatrix.ravel()
         vector = np.array([vector])
-        pdb.set_trace()
+        self.network_viewer.update_input(vector[0])
         answer = self.network.query_network(vector[0])
         self.set_number(answer.argmax())
         return answer
@@ -88,26 +92,8 @@ class NumRecApp(tk.Tk):
         self.drawing_canvas.clear_canvas()
         self.num_display_label.configure(fg="white")
 
-    def correction(self):
-        self.grab_set()
-        # center on current window
-        new_x = int(self.winfo_x() + (self.winfo_width()/4))
-        new_y = int(self.winfo_y() + (self.winfo_height()/4))
-
-        self.corr_popup.geometry(f"+{new_x}+{new_y}")
-        self.corr_popup.deiconify()
-
-    def correction_return(self, event):
-        self.grab_release()
-        self.corr_popup.withdraw()
-
-    def update_network(self, event):
-        self.grab_release()
-        self.corr_popup.withdraw()
-
-
 def main():
-    model_file = os.path.join("model", "NumRecNet_rand600k_epoch36_nodes28_.pkl")
+    model_file = os.path.join("model", "CRNNet_45Nodes_.pkl")
     network = pickle.load(open(model_file, 'rb'))
     app = NumRecApp(network)
     app.mainloop()

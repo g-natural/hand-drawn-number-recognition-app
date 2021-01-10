@@ -1,0 +1,49 @@
+Instuctions for training and testing the network.
+
+In order to train and test the network, the MNIST training and testing sets will
+need to be downloaded (they are not included here because they are quite large).
+They can be downloaded from here: http://yann.lecun.com/exdb/mnist/ 
+NOTE: both the labels and images of the testing and training sets must be downloaded, 
+which means 4 items will be downloaded.
+
+Once downloaded, tranfer them to the project's assets/mnist folder and
+rename them if necessary, so the directory looks like this:
+
+testing10000.csv         training60000.csv
+testing10000_labels.csv  training60000_labels.csv
+
+The testing and training sets will then need to be generated. This is
+ncesesary because all the MNIST testing sets are in a gradient (meaning they
+are not just black and white but have grey values), and they are all roughly
+centered. In order to train the network to recognize a large range of characters
+drawn anywhere on the canvas, the images are going to need to be translated on the
+canvas and their pixels meade either blakc or white (no grey).
+
+To do this, use the instance_generator.py script. The script is set up by default to
+generate the amount of sets you are likely to want (which is 40 training sets and 5 testing sets),
+and to use the mnist directory and names previosly specified. If however, you would like to
+generate a different amount, the script accepts arguments to do so. Consult
+the script's --help option to learn how to do that.
+
+By default the script will generate it all with one invocation:
+$python3 instance_generator.py
+
+But if desired only one type of set can be generated:
+$python3 instance_generator.py --test_sets
+
+Once the sets have been generated, the network needs to be created and trained.
+This will be done using the train_network.py script, which will create and train
+the network on available training sets. Many options are available to edit this
+process, but script by default trains on all the sets in the train_sets directory,
+and tests the network every 10 sets the network trains on. This gives a good idea of
+how the network's accuracy is progressing, and how effective it is currently. After
+training the network will be saves as a Pickle (.pkl) object which can be deserialized
+for use in other scripts (such as the number recognition app).
+
+Once the network is trained it can be further tested using the test_network.py
+script (see --help on the script for more details) or the resulting network can
+be used in the number recognition app. To use the network in the app, modify the
+value of the model_file vairable, in the main() function in NumRegApp.py, to specify
+the wanted model file.
+
+
