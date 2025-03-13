@@ -1,4 +1,5 @@
 # Character Recognition Neural Network
+# written by Nick Passantino
 import numpy as np
 import math
 import time
